@@ -37,7 +37,7 @@ Example of a custom filter:
 def custom(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-		dataset = func(*args, **kwargs)
+        dataset = func(*args, **kwargs)
         return dataset.drop(columns=['commit', 'name'])
     return wrapper
 ```

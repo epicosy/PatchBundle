@@ -15,7 +15,7 @@ from utils.decorators.io import load, save
 from utils.decorators.filter import c_code, equal_adds_dels, one_line_changes
 
 
-git = Github("114b1d6e1a4fbbd2473b492bd3a8dcf5cf9ba370")
+git = Github("")
 
 
 class Patch:
