@@ -6,6 +6,7 @@ from urllib import request
 import pandas as pd
 from pathlib import Path
 from github import Github
+from os.path import dirname
 
 from utils.data_structs import DataPaths
 from utils.functions import check_extension, parse_cve_id, comment_remover
@@ -15,7 +16,14 @@ from utils.decorators.io import load, save
 from utils.decorators.filter import c_code, equal_adds_dels, one_line_changes
 
 
-git = Github("")
+ROOT_DIR = dirname(dirname(__file__))
+
+# readk token from file
+
+with open(f'{ROOT_DIR}/token.txt', 'r') as t:
+	token = t.read().splitlines()[0]
+
+git = Github(token)
 
 
 class Patch:
