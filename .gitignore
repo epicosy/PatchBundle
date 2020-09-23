@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Ignore the github personal access token
+/tool/token.txt
+
 # C extensions
 *.so
 
