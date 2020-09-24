@@ -1,6 +1,16 @@
 # PatchBundle
 A Framework for Manipulating Existing Datasets of Security Patches for Automatic Program Repair Techniques and Studies
 
+
+## Prerequisites
+
+* [Python (=>3.7)](https://www.python.org/)
+
+### Python Dependencies
+* [Pandas (>=1.0.3)](https://pandas.pydata.org/)
+* [Github](https://pygithub.readthedocs.io/en/latest/introduction.html)
+
+
 ## Baseline
 
 The baseline usage involves three operations: collect, transform and filter.
