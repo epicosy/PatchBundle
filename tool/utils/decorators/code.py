@@ -24,6 +24,7 @@ def remove_comments(func: Callable):
     @wraps(func)
     def wrapper(*args, **kwargs):
         code = func(*args, **kwargs)
+
         if code:
             return re.sub(pattern, replacer, code)
         return code
@@ -40,7 +41,7 @@ def split_lines(func):
     return wrapper
 
 
-def clean_code_lines(func):
+def clean_code_file(func: Callable):
     @split_lines
     @remove_comments
     @wraps(func)

@@ -99,7 +99,7 @@ class NVD(object):
                         continue
 
                     patch = files_to_patch(**pair, name=a.name, lang=a.lang)
-                    patch_record = PatchRecord(project=a.project, commit='', year=a.year, number=a.number, patch=patch)
+                    patch_record = PatchRecord(project=a.project, commit='', year=a.year, number=a.number, patches=[patch])
 
                     patch_records = patch_record.to_dict()
                     data.extend(patch_records)

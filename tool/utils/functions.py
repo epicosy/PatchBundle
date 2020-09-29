@@ -83,10 +83,3 @@ def get_name_lang(diff_file):
 
     return "", ""
 
-
-def parse_advisories(id_advs: str):
-    match = re.match(advisories_pattern, id_advs)
-    if match:
-        return match.group(1), match.group(2)
-
-    return "", ""

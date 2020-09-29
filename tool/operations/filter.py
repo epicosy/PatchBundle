@@ -20,6 +20,8 @@ class Filter(Base):
 
         if self.merge and len(frames) > 1:
             result = pd.concat(frames, ignore_index=True, sort=False)
+            result.drop_duplicates(subset="hunk", keep=False, inplace=True)
+            print(len(result))
             result.to_pickle(self.configs.data_paths.filtered / Path('merged.pkl'))
 
 

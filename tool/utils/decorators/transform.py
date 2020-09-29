@@ -6,7 +6,7 @@ import pandas as pd
 from functools import wraps
 from typing import Callable, Union
 from utils.code_parser import Patch
-from .code import clean_code_lines
+from .code import clean_code_file
 
 
 frame_columns = ['project', 'commit', 'cve_year', 'cve_number', 'name', 'lang', 'hunk', 'additions', 'deletions',
@@ -39,7 +39,7 @@ def create_patch(func: Callable):
 
 
 @create_patch
-@clean_code_lines
+@clean_code_file
 def file_to_patch(patch_file: Union[str, Path], name: str = '', lang: str = '', **kwargs):
     if isinstance(patch_file, str):
         patch_file = Path(patch_file)
@@ -56,9 +56,8 @@ def parse_patch_file(func: Callable):
         patch_record_args = func(*args, **kwargs)
 
         patch = file_to_patch(**kwargs)
-        patch_record_args.update({'patch': patch})
+        patch_record_args.update({'patches': [patch]})
 
         return patch_record_args
 
     return wrapper_parse_patch_file
-

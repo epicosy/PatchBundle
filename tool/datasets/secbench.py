@@ -15,13 +15,12 @@ from utils.decorators.transform import dict_to_frame, parse_patch_file
 from utils.decorators.io import load, save
 from utils.decorators.filter import c_code, equal_adds_dels, one_line_changes
 
-
 ROOT_DIR = dirname(dirname(__file__))
 
 # readk token from file
 
 with open(f'{ROOT_DIR}/token.txt', 'r') as t:
-	token = t.read().splitlines()[0]
+    token = t.read().splitlines()[0]
 
 git = Github(token)
 
@@ -103,8 +102,9 @@ class SecBench:
         request.urlretrieve(source, str(out_file_path))
         commit_dataset = pd.read_csv(str(out_file_path))
         print(f"Filtering by language.")
-        filtered_ext = commit_dataset[commit_dataset.apply(lambda x: check_extension(x.Language), axis=1)].copy(deep=True)
-        filtered_ext["dir"] = len(filtered_ext)*[""]
+        filtered_ext = commit_dataset[commit_dataset.apply(lambda x: check_extension(x.Language), axis=1)].copy(
+            deep=True)
+        filtered_ext["dir"] = len(filtered_ext) * [""]
 
         for i, row in filtered_ext.iterrows():
             patch = Patch(row, out_path)

@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 
 import pandas as pd
+import re
 
 from collections import Callable
 from datetime import datetime
 from functools import wraps
 
-from utils.functions import parse_cve_id, parse_advisories
+from utils.patterns import advisories_pattern
+from utils.functions import parse_cve_id
+
+
+def parse_advisories(id_advs: str):
+    match = re.match(advisories_pattern, id_advs)
+    if match:
+        return match.group(1), match.group(2)
+
+    return "", ""
 
 
 def parse_commit(func: Callable):
