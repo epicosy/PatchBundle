@@ -12,7 +12,7 @@ class Transform(Base):
     def __call__(self, *args, **kwargs):
         for ds in self.datasets:
             data_set = ds.cls(name=ds.name, paths=self.configs.data_paths)
-            data_set.transform(path=self.configs.data_paths.transformed / Path(ds.name + '.pkl'))
+            data_set.transform()
             self.log(f"Transformed data for {ds.name}\n.")
 
 

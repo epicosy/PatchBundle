@@ -40,7 +40,28 @@ def one_line_changes(func: Callable):
     @reset_index
     def wrapper_one_line_changes(*args, **kwargs):
         dataset = func(*args, **kwargs)
-        one_frame = dataset.loc[dataset["additions"] == 1]
+        one_frame = dataset.loc[dataset["additions"] == 1 & dataset["deletions"] == 1]
         return one_frame
     return wrapper_one_line_changes
 
+
+def two_chunk_changes(func: Callable):
+    """Filters dataset by two chunks changes in the hunk."""
+    @functools.wraps(func)
+    @reset_index
+    def wrapper_two_chunk_changes(*args, **kwargs):
+        dataset = func(*args, **kwargs)
+        two_chunks = dataset.loc[(dataset["changes"] > 0) & dataset["changes"] <= 2]
+        return two_chunks
+    return wrapper_two_chunk_changes
+
+
+def no_nulls(func: Callable):
+    """Filters dataset by equal additions and deletions in the hunk."""
+    @functools.wraps(func)
+    @reset_index
+    def wrapper_equal_adds_dels(*args, **kwargs):
+        dataset = func(*args, **kwargs)
+        eq_frame = dataset.loc[(dataset["additions"] > 0) & (dataset["deletions"] > 0)]
+        return eq_frame
+    return wrapper_equal_adds_dels

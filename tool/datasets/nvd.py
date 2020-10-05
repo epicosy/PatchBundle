@@ -5,15 +5,12 @@ import urllib.request as request
 from zipfile import ZipFile
 from pathlib import Path
 
-from utils.data_structs import DataPaths
+from utils.dataset import Dataset
 from utils.functions import check_extension
-from utils.patch_record import PatchRecord
 
 # Decorators
 from utils.decorators.code import remove_comments, split_lines
-from utils.decorators.transform import create_patch, dict_to_frame
-from utils.decorators.io import load, save
-from utils.decorators.filter import c_code, equal_adds_dels, one_line_changes
+from utils.decorators.transform import create_patch
 
 
 class CVEFile:
@@ -57,16 +54,13 @@ def files_to_patch(vuln: CVEFile, patched: CVEFile, name: str, lang: str):
 
     # TODO: ADD number of context lines to diff
     return difflib.unified_diff(vuln_lines,
-                                patched_lines, fromfile=vuln.file.name, tofile=patched.file.name, n=10)
+                                patched_lines, fromfile=vuln.file.name, tofile=patched.file.name)
 
 
-class NVD(object):
-    def __init__(self, name: str, paths: DataPaths):
-        self.name = name
+class NVD(Dataset):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.mapping = {}
-        self.paths = paths
-        self.collected_path = self.paths.collected / Path(self.name)
-        self.transformed = self.paths.transformed / Path(self.name + '.pkl')
 
     def collect(self, source: str):
         out_path = self.paths.collected / Path(self.name)
@@ -81,11 +75,8 @@ class NVD(object):
 
         out_file_path.unlink()
 
-    @save
-    @dict_to_frame
-    def transform(self, path: Path):
+    def transform(self):
         self._map()
-        data = []
 
         for i, (folder, cve_files) in enumerate(self.mapping.items()):
             if len(cve_files) >= 2:
@@ -99,22 +90,13 @@ class NVD(object):
                         continue
 
                     patch = files_to_patch(**pair, name=a.name, lang=a.lang)
-                    patch_record = PatchRecord(project=a.project, commit='', year=a.year, number=a.number, patches=[patch])
+                    patch_record_args = {'project': a.project, 'commit': '', 'year': a.year, 'number': a.number,
+                                         'patches': [patch]}
+                    self.__call__(patch_record_args)
 
-                    patch_records = patch_record.to_dict()
-                    data.extend(patch_records)
-
-        return data
+        self.data_to_pickle()
 
     def _map(self):
         for folder in self.collected_path.iterdir():
             self.mapping[folder.name] = [CVEFile(file) for file in folder.iterdir() if check_extension(file.suffix)]
 
-    @save
-    @one_line_changes
-    @equal_adds_dels
-    @c_code
-    @load
-    def filter(self, path: Path):
-        print(f"Filtering {self.name}")
-        return self.transformed

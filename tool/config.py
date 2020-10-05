@@ -28,7 +28,6 @@ class Config:
 data_sets = {"nvd": ("https://github.com/VulDeePecker/Comparative_Study/raw/master/Source%20programs/NVD.zip", datasets.NVD),
              "secbench": ("https://github.com/TQRG/secbench/raw/master/dataset/secbench.csv", datasets.SecBench),
              "mozilla": ("mozilla/mozilla.csv", datasets.Mozilla),
-             "vuln7": ("", datasets.Vuln7),
              "secretpatch": ("https://github.com/SecretPatch/Dataset/raw/master/SecurityDataset.zip", datasets.SecretPatch),
              "msr20vuln": ("https://github.com/ZeoVan/MSR_20_Code_vulnerability_CSV_Dataset/raw/master/" +
                            "all_c_cpp_release2.0.csv", datasets.MSR20Vuln)

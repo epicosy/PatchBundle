@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
 import re
-from collections import Callable
 from pathlib import Path
 
-from .functions import is_comment, check_extension
+from .functions import is_comment
 
 
 class Hunk:
@@ -13,17 +12,23 @@ class Hunk:
         self.lines = []
         self.additions = additions
         self.deletions = deletions
+        self.changes = 0
+        self.prev = ''
 
     def __call__(self, line: str):
-        self.lines.append(line)
-
         # deletions
         if line.startswith('-'):
             self.deletions += 1
-
+            if not self.prev == '-':
+                self.changes += 1
         # additions
         elif line.startswith('+'):
             self.additions += 1
+            if not self.prev == '+':
+                self.changes += 1
+
+        self.prev = line[0]
+        self.lines.append(line)
 
 
 class DiffParser:

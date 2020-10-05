@@ -5,12 +5,9 @@ from pathlib import Path
 import pandas as pd
 from requests import get
 
-from utils.data_structs import DataPaths
-from utils.decorators.filter import c_code, equal_adds_dels, one_line_changes
-from utils.decorators.io import load, save
-from utils.decorators.transform import dict_to_frame, parse_patch_file
+from utils.dataset import Dataset
+from utils.decorators.transform import parse_patch_file
 from utils.decorators.mozilla import parse_commit, parse_year_number
-from utils.patch_record import PatchRecord
 
 
 # DATASET_COLUMNS (P_ID, P_URL, R_ID, P_COMMIT, ERROR_SIMILARITY, SITUATION, RELEASES, DATE,
@@ -41,12 +38,9 @@ def transform_columns(**record):
     return {'project': record['PRODUCTS']}
 
 
-class Mozilla:
-    def __init__(self, name: str, paths: DataPaths):
-        self.name = name
-        self.paths = paths
-        self.collected_path = self.paths.collected / Path(self.name)
-        self.transformed = self.paths.transformed / Path(self.name + '.pkl')
+class Mozilla(Dataset):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def collect(self, source: str):
         dataset = pd.read_csv(self.paths.collected / Path(source))
@@ -60,10 +54,7 @@ class Mozilla:
 
         dataset.to_csv(str(self.paths.collected / Path(source)))
 
-    @save
-    @dict_to_frame
-    def transform(self, path: Path):
-        data = []
+    def transform(self):
         MOZILLA = self.collected_path / Path("mozilla.csv")
         dataset = pd.read_csv(MOZILLA)
         no_nulls = dataset[dataset['patch_file'].notnull()].reset_index()
@@ -74,22 +65,6 @@ class Mozilla:
             record['name'] = ''
             record['lang'] = ''
             patch_record_args = transform_columns(**record)
-            patch_record = PatchRecord(**patch_record_args)
+            self.__call__(patch_record_args)
 
-            if not patch_record.has_patch():
-                continue
-
-            patch_records = patch_record.to_dict()
-            data.extend(patch_records)
-
-        return data
-
-    @save
-    @one_line_changes
-    @equal_adds_dels
-    @c_code
-    @load
-    def filter(self, path: Path):
-        print(f"Filtering {self.name}")
-        return self.transformed
-
+        self.data_to_pickle()

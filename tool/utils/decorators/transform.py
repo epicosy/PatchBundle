@@ -1,28 +1,10 @@
 #!/usr/bin/env python3
 from pathlib import Path
 
-import pandas as pd
-
 from functools import wraps
 from typing import Callable, Union
 from utils.code_parser import Patch
 from .code import clean_code_file
-
-
-frame_columns = ['project', 'commit', 'cve_year', 'cve_number', 'name', 'lang', 'hunk', 'additions', 'deletions',
-                 'hunk_name']
-
-
-def dict_to_frame(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        data = func(*args, **kwargs)
-        frame = pd.DataFrame.from_dict(data)
-        print(f"Hunks count: {len(frame)}")
-        frame.drop_duplicates(subset="hunk", keep=False, inplace=True)
-        print(f"Unique hunks count: {len(frame)}")
-        return frame
-    return wrapper
 
 
 def create_patch(func: Callable):

@@ -15,7 +15,7 @@ class Filter(Base):
         frames = []
         for ds in self.datasets:
             data_set = ds.cls(name=ds.name, paths=self.configs.data_paths)
-            frames.append(data_set.filter(path=self.configs.data_paths.filtered / Path(ds.name + '.pkl')))
+            frames.append(data_set.filter())
             self.log(f"Filtered data for {ds.name}\n.")
 
         if self.merge and len(frames) > 1:

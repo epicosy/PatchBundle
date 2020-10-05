@@ -38,6 +38,7 @@ class PatchRecord:
                                     'hunk': '\n'.join(hunk.lines),
                                     'additions': hunk.additions,
                                     'deletions': hunk.deletions,
-                                    'hunk_name': hunk.name
+                                    'hunk_name': hunk.name,
+                                    'changes': hunk.changes
                                     })
         return records

@@ -8,12 +8,10 @@ from pathlib import Path
 from github import Github
 from os.path import dirname
 
-from utils.data_structs import DataPaths
+from utils.dataset import Dataset
 from utils.functions import check_extension, parse_cve_id, comment_remover
-from utils.patch_record import PatchRecord
-from utils.decorators.transform import dict_to_frame, parse_patch_file
-from utils.decorators.io import load, save
-from utils.decorators.filter import c_code, equal_adds_dels, one_line_changes
+from utils.decorators.transform import parse_patch_file
+
 
 ROOT_DIR = dirname(dirname(__file__))
 
@@ -86,18 +84,14 @@ def transform_columns(**record):
     return {'project': record['project'], 'commit': record['sha'], 'year': record['Year']}
 
 
-class SecBench:
-    def __init__(self, name: str, paths: DataPaths):
-        self.name = name
-        self.paths = paths
-        self.collected_path = self.paths.collected / Path(self.name)
-        self.transformed = self.paths.transformed / Path(self.name + '.pkl')
+class SecBench(Dataset):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def collect(self, source: str):
-        out_path = self.paths.collected / Path(self.name)
-        out_path.mkdir(parents=True, exist_ok=True)
+        self.collected_path.mkdir(parents=True, exist_ok=True)
         out_file = source.split("/")[-1]
-        out_file_path = out_path / Path(out_file)
+        out_file_path = self.collected_path / Path(out_file)
         print(f"Downloading from source {source}")
         request.urlretrieve(source, str(out_file_path))
         commit_dataset = pd.read_csv(str(out_file_path))
@@ -107,16 +101,13 @@ class SecBench:
         filtered_ext["dir"] = len(filtered_ext) * [""]
 
         for i, row in filtered_ext.iterrows():
-            patch = Patch(row, out_path)
+            patch = Patch(row, self.collected_path)
             filtered_ext.loc[i, 'dir'] = patch()
 
         filtered_ext.to_csv(str(out_file_path))
 
-    @save
-    @dict_to_frame
-    def transform(self, path: Path):
+    def transform(self):
         SECBENCH = self.collected_path / Path("secbench.csv")
-        data = []
         commit_dataset = pd.read_csv(SECBENCH)
         records = commit_dataset.to_dict(orient='records')
 
@@ -130,21 +121,6 @@ class SecBench:
                 record['lang'] = f.suffix
                 record['name'] = f.stem
                 patch_record_args = transform_columns(**record)
-                patch_record = PatchRecord(**patch_record_args)
+                self.__call__(patch_record_args)
 
-                if not patch_record.has_patch():
-                    continue
-
-                patch_records = patch_record.to_dict()
-                data.extend(patch_records)
-
-        return data
-
-    @save
-    @one_line_changes
-    @equal_adds_dels
-    @c_code
-    @load
-    def filter(self, path: Path):
-        print(f"Filtering {self.name}")
-        return self.transformed
+        self.data_to_pickle()
