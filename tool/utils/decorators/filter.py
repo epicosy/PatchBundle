@@ -47,11 +47,12 @@ def one_line_changes(func: Callable):
 
 def two_chunk_changes(func: Callable):
     """Filters dataset by two chunks changes in the hunk."""
+    # TODO: change name, this filter selects contigous hunk changes
     @functools.wraps(func)
     @reset_index
     def wrapper_two_chunk_changes(*args, **kwargs):
         dataset = func(*args, **kwargs)
-        two_chunks = dataset.loc[(dataset["changes"] > 0) & dataset["changes"] <= 2]
+        two_chunks = dataset.loc[dataset["changes"] == 2]
         return two_chunks
     return wrapper_two_chunk_changes
 
@@ -65,3 +66,15 @@ def no_nulls(func: Callable):
         eq_frame = dataset.loc[(dataset["additions"] > 0) & (dataset["deletions"] > 0)]
         return eq_frame
     return wrapper_equal_adds_dels
+
+
+def max_line_changes(lines: int):
+    def decorator_max_changes(func: Callable):
+        """Filters dataset by equal additions and deletions in the hunk."""
+        @functools.wraps(func)
+        @reset_index
+        def wrapper_max_changes(*args, **kwargs):
+            dataset = func(*args, **kwargs)
+            return dataset[dataset.apply(lambda x: x.additions + x.deletions <= lines, axis=1)]
+        return wrapper_max_changes
+    return decorator_max_changes

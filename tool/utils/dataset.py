@@ -10,7 +10,7 @@ from utils.data_structs import DataPaths
 from utils.patch_record import PatchRecord
 
 # Decorators
-from utils.decorators.filter import c_code, two_chunk_changes, no_nulls
+from utils.decorators.filter import c_code, two_chunk_changes, no_nulls, max_line_changes
 
 
 class Dataset(ABC):
@@ -38,6 +38,7 @@ class Dataset(ABC):
     def transform(self):
         pass
 
+    @max_line_changes(lines=20)
     @no_nulls
     @two_chunk_changes
     @c_code
