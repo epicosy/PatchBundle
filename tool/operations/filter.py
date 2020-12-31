@@ -22,7 +22,7 @@ class Filter(Base):
             result = pd.concat(frames, ignore_index=True, sort=False)
             result.drop_duplicates(subset="hunk", keep=False, inplace=True)
             print(len(result))
-            result.to_pickle(self.configs.data_paths.filtered / Path('merged.pkl'))
+            result.to_pickle(self.configs.data_paths.filtered / Path('merged.pkl'), protocol=4)
 
 
 def filter_args(input_parser):
