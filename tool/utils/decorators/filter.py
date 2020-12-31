@@ -18,7 +18,7 @@ def c_code(func: Callable):
     @reset_index
     def wrapper_c_code(*args, **kwargs):
         dataset = func(*args, **kwargs)
-        c_code_frame = dataset[dataset.apply(lambda row: row['lang'] in ['.c', '.h', '.cpp', '.cxx'], axis=1)]
+        c_code_frame = dataset[dataset.apply(lambda row: row['lang'] in ['.c', '.h', '.cpp'], axis=1)]
         return c_code_frame
     return wrapper_c_code
 
